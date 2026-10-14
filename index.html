@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 문자 인코딩: 이모지·특수문자(’ 등)가 깨지지 않도록 UTF-8을 사용합니다 -->
+  <meta charset="UTF-8" />
+  <!-- 모바일에서 화면 폭에 맞춰 보이도록 하는 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Day in Hyungee’s World</title>
+  <meta name="description" content="Come explore the little things I love." />
+
+  <!-- 웹폰트 (Google Fonts): 제목용 세리프 Fraunces + 본문용 Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- 디자인(스타일) 파일 연결 -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<!--
+  data-mode: 지금 보여주는 캐릭터(work / foodie / offduty / sleep) — 캐릭터 모션에 사용
+  data-sky : 실제 서울 하늘 단계(morning / daylight / golden / night / neutral)
+             → style.css가 배경 그라데이션과 글자색을 이 값에 맞춰 바꿉니다. (캐릭터와 별개)
+-->
+<body data-mode="work" data-sky="neutral">
+
+  <!-- 화면 전체 하늘 배경: 단계별 그라데이션을 겹쳐 두고 script.js가 투명도로 섞음 -->
+  <div class="backdrop" id="backdrop" aria-hidden="true">
+    <div class="backdrop__layer backdrop__layer--neutral" data-layer="neutral" style="opacity: 1"></div>
+    <div class="backdrop__layer backdrop__layer--morning" data-layer="morning"></div>
+    <div class="backdrop__layer backdrop__layer--daylight" data-layer="daylight"></div>
+    <div class="backdrop__layer backdrop__layer--golden" data-layer="golden"></div>
+    <div class="backdrop__layer backdrop__layer--night" data-layer="night"></div>
+  </div>
+
+  <!-- ===== 1. 상단: 서울 날짜·시간·날씨 + 사이트 제목 ===== -->
+  <header class="masthead">
+    <p class="masthead__label">Hyungee Jo · Seoul</p>
+    <!-- 메인 헤드라인: 서울 요일에 맞춰 자동으로 바뀜 (예: Hello, it's Wednesday!) -->
+    <h1 class="greeting" id="greeting">Hello!</h1>
+    <!-- 서울 현재 시간 · 실제 날씨 (script.js가 실시간으로 채움) -->
+    <p class="masthead__now">
+      <span id="seoul-time">—</span>
+      <span class="masthead__sep" aria-hidden="true">·</span>
+      <span id="seoul-weather" class="masthead__weather">--</span>
+    </p>
+  </header>
+
+  <!--
+    ===== 2. 메인 무대 =====
+    데스크톱: [왼쪽 썸네일] [가운데 큰 캐릭터] [오른쪽 설명]
+    모바일:   큰 캐릭터 → 썸네일(가로 4칸) → 설명  (순서는 style.css에서 바꿈)
+  -->
+  <main class="stage">
+
+    <!-- 2-1. 캐릭터 선택 카드 (순서 고정: Work → Foodie → Off-Duty → Sleep) -->
+    <nav class="picker" aria-label="Choose a character">
+      <ul class="picker__list" id="picker">
+        <!-- 카드 4개는 script.js가 CHARACTERS 데이터로 만들어 넣습니다 -->
+      </ul>
+    </nav>
+
+    <!--
+      2-2. 가운데 큰 캐릭터
+      hero__art: 이미지와 똑같은 비율의 상자. 그래서 % 좌표 = 이미지 속 위치가 됩니다.
+      - hero__base: 기본 이미지
+      - hero__part (a, b): 같은 이미지를 한 장 더 겹치고, 머리·손·입 같은 '부분'만 보이게 가린 뒤
+        아주 조금 움직입니다. → 한 장의 PNG로 부분이 움직이는 듯한 느낌을 냄 (style.css 6-1 참고)
+      - hero__zzz: Sleep 모드에서만 떠오르는 작은 z 글자
+      sky: 캐릭터 뒤쪽 하늘 레이어. 실제 서울 일출·일몰에 맞춰 해/달이 움직입니다 (script.js "F-2")
+    -->
+    <figure class="hero">
+      <div class="sky" id="sky" data-phase="loading" aria-hidden="true">
+        <div class="sky__stars" id="sky-stars"></div>
+        <div class="sky__halo"></div>
+        <div class="sky__body sky__moon"></div>
+        <div class="sky__body sky__sun"></div>
+      </div>
+      <div class="hero__art" id="hero-art" data-motion="work" style="--ratio: 1131 / 1354">
+        <img class="hero__layer hero__base" id="hero-image"
+             src="assets/work-hyungee.webp" alt="" width="1131" height="1354" />
+        <img class="hero__layer hero__part hero__part--a" src="assets/work-hyungee.webp" alt="" aria-hidden="true" />
+        <img class="hero__layer hero__part hero__part--b" src="assets/work-hyungee.webp" alt="" aria-hidden="true" />
+        <span class="hero__zzz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></span>
+      </div>
+    </figure>
+
+    <!-- 2-3. 오른쪽 설명 패널 (내용은 script.js가 채움) -->
+    <section class="info" id="info" aria-live="polite">
+      <div class="info__top">
+        <!-- 지금 시간에 맞는 캐릭터인지, 직접 고른 캐릭터인지 표시 -->
+        <p class="info__status" id="info-status">
+          <span class="info__dot" aria-hidden="true"></span>
+          <span id="info-status-text">Live now</span>
+        </p>
+        <!-- 직접 다른 캐릭터를 골랐을 때만 나타나는 작은 텍스트 링크 -->
+        <button class="back-to-now" id="back-to-now" type="button" hidden>Back to Now</button>
+      </div>
+
+      <div class="info__content" id="info-content">
+        <p class="info__label" id="info-label"></p>
+        <h2 class="info__title" id="info-title"></h2>
+        <p class="info__body" id="info-body"></p>
+
+        <!-- 소속·직무 같은 정보 (Work에만 있음) -->
+        <dl class="info__facts" id="info-facts" hidden></dl>
+
+        <!-- 지금 시간과 다른 캐릭터를 골랐을 때 나오는 재치 있는 한 줄 -->
+        <p class="info__quip" id="info-quip" hidden></p>
+
+        <!-- 연락 방법 + 실제 연락 버튼 -->
+        <p class="info__cta" id="info-cta"></p>
+        <div class="info__actions" id="info-actions"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Hyungee · All times in Korea Standard Time (KST)</p>
+  </footer>
+
+  <!--
+    ===== 시간 테스트 패널 =====
+    주소 끝에 ?test 를 붙여 열면 나타납니다. 예) http://localhost:8000/?test
+    임의의 한국시간을 넣어 캐릭터가 바뀌는지 확인할 수 있어요. (일반 방문자에게는 안 보임)
+  -->
+  <aside class="test-panel" id="test-panel" aria-label="Time test panel" hidden>
+    <!-- <details>: 제목(summary)을 누르면 접고 펼 수 있어서 화면을 가리지 않게 할 수 있음 -->
+    <details open>
+      <summary class="test-panel__title">Time test · Seoul (KST)</summary>
+      <label class="test-panel__field">
+        <span>Pick a Seoul date &amp; time</span>
+        <input type="datetime-local" id="test-input" step="60" />
+      </label>
+      <div class="test-panel__presets" id="test-presets"></div>
+      <button type="button" class="test-panel__reset" id="test-reset">Use real time</button>
+    </details>
+  </aside>
+
+  <!-- 동작(인터랙션) 파일 연결. 맨 아래에 두면 HTML을 다 읽은 뒤 실행됩니다 -->
+  <script src="script.js"></script>
+</body>
+</html>

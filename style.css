@@ -1,0 +1,1054 @@
+/* =========================================================
+   style.css — 웹사이트의 디자인(색, 글꼴, 배치, 애니메이션)
+   Version 2.0 · A Day in Hyungee’s World
+   ========================================================= */
+
+/* ---------- 1. 하늘 단계별 색상 ----------
+   배경과 글자색은 '캐릭터'가 아니라 '실제 서울 하늘'을 따릅니다.
+   <body data-sky="..."> 값(morning / daylight / golden / night / neutral)은
+   script.js가 서울 일출·일몰 시각으로 정해줍니다.
+   색을 바꾸고 싶으면 여기 숫자만 고치면 사이트 전체에 반영돼요.
+   --bg     대표 배경색(버튼 글자 등)   --ink    기본 글자색
+   --muted  보조 글자색               --line   얇은 테두리선
+   --card   카드 배경                 --accent 포인트 색
+   --shadow 그림자 색
+   --sun-high/--sun-low/--sun-halo  해 색 (높이 떴을 때 / 지평선 근처 / 빛 번짐)
+   --moon/--moon-glow/--star         달·별 색
+   --halo   일출·일몰 정보가 없을 때 쓰는 중립 원형 배경 */
+:root {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1); /* 부드럽게 멈추는 움직임 */
+  --fade: 0.45s;                          /* 캐릭터·설명이 바뀔 때 걸리는 시간 */
+  --theme: 1.2s;                          /* 하늘 단계가 바뀔 때 글자색 등이 바뀌는 시간 */
+  --radius-lg: 28px;
+  --radius-md: 18px;
+}
+
+/* 중립(일출·일몰 정보를 못 불러왔을 때) */
+body,
+body[data-sky="neutral"] {
+  --bg: #EEEAE4;
+  --ink: #2F2A26;
+  --muted: #6B6158;
+  --line: rgba(47, 42, 38, 0.14);
+  --card: rgba(255, 255, 255, 0.55);
+  --card-strong: rgba(255, 255, 255, 0.85);
+  --accent: #8C6E54;
+  --shadow: rgba(47, 42, 38, 0.16);
+  --sun-high: #F2D9B5;
+  --sun-low: #EAB386;
+  --sun-halo: rgba(240, 200, 150, 0.3);
+  --moon: #F7F2EA;
+  --moon-glow: rgba(47, 42, 38, 0.08);
+  --star: rgba(47, 42, 38, 0.25);
+  --halo: rgba(255, 255, 255, 0.5);
+}
+
+/* Morning: 크림·골드·연한 피치 */
+body[data-sky="morning"] {
+  --bg: #F7E6CC;
+  --ink: #3A2E26;
+  --muted: #74645A;
+  --line: rgba(58, 46, 38, 0.14);
+  --card: rgba(255, 252, 245, 0.5);
+  --card-strong: rgba(255, 252, 246, 0.85);
+  --accent: #A8743F;
+  --shadow: rgba(120, 80, 40, 0.16);
+  --sun-high: #F8DFA8;
+  --sun-low: #F2AE78;
+  --sun-halo: rgba(250, 214, 150, 0.45);
+  --moon: rgba(255, 252, 244, 0.75);
+  --moon-glow: rgba(255, 245, 225, 0.3);
+  --star: rgba(120, 95, 70, 0.22);
+  --halo: rgba(255, 250, 240, 0.5);
+}
+
+/* Daylight: 페일 블루·아이보리 */
+body[data-sky="daylight"] {
+  --bg: #E8EEF1;
+  --ink: #24303B;
+  --muted: #586572;
+  --line: rgba(36, 48, 59, 0.13);
+  --card: rgba(255, 255, 255, 0.55);
+  --card-strong: rgba(255, 255, 255, 0.86);
+  --accent: #4A6C88;
+  --shadow: rgba(36, 48, 59, 0.14);
+  --sun-high: #FCF4DE;
+  --sun-low: #F4D3A0;
+  --sun-halo: rgba(255, 250, 232, 0.7);
+  --moon: rgba(255, 255, 255, 0.8);
+  --moon-glow: rgba(255, 255, 255, 0.3);
+  --star: rgba(36, 48, 59, 0.2);
+  --halo: rgba(255, 255, 255, 0.55);
+}
+
+/* Golden Hour: 살구·로즈·라벤더 노을 */
+body[data-sky="golden"] {
+  --bg: #EBC4BE;
+  --ink: #3A2832;
+  --muted: #6A5260;
+  --line: rgba(58, 40, 50, 0.15);
+  --card: rgba(255, 246, 242, 0.45);
+  --card-strong: rgba(255, 249, 246, 0.8);
+  --accent: #A3536A;
+  --shadow: rgba(90, 40, 60, 0.18);
+  --sun-high: #F8C994;
+  --sun-low: #EC8C68;
+  --sun-halo: rgba(246, 170, 130, 0.4);
+  --moon: rgba(255, 249, 240, 0.78);
+  --moon-glow: rgba(255, 240, 230, 0.3);
+  --star: rgba(255, 255, 255, 0.65);
+  --halo: rgba(255, 240, 235, 0.45);
+}
+
+/* Night: 미드나이트 블루 + 은은한 달빛 (글자·버튼은 밝게) */
+body[data-sky="night"] {
+  --bg: #1F2840;
+  --ink: #F3EFE7;
+  --muted: #B9BAC8;
+  --line: rgba(243, 239, 231, 0.16);
+  --card: rgba(255, 255, 255, 0.06);
+  --card-strong: rgba(255, 255, 255, 0.13);
+  --accent: #E6CB8C;
+  --shadow: rgba(0, 0, 0, 0.4);
+  --sun-high: rgba(217, 192, 138, 0.55);
+  --sun-low: rgba(201, 139, 98, 0.55);
+  --sun-halo: rgba(232, 199, 126, 0.1);
+  --moon: rgba(242, 232, 206, 0.5);   /* 밤에도 눈부시지 않게 */
+  --moon-glow: rgba(242, 232, 206, 0.16);
+  --star: rgba(245, 240, 232, 0.55);
+  --halo: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- 1-1. 화면 전체 하늘 그라데이션 ----------
+   단계별 그라데이션을 겹쳐 두고, script.js가 각 층의 투명도를 조절해
+   단계가 바뀔 때(약 30분에 걸쳐) 끊김 없이 섞이도록 합니다. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.backdrop__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s linear;
+}
+
+.backdrop__layer--neutral  { background: linear-gradient(180deg, #E9E5DF 0%, #F2EFEA 60%, #EEEAE4 100%); }
+.backdrop__layer--morning  { background: linear-gradient(180deg, #F6E3BF 0%, #F9EAD6 45%, #F6D3BC 100%); }
+.backdrop__layer--daylight { background: linear-gradient(180deg, #D8E5F0 0%, #E8EFF2 50%, #F6F2E7 100%); }
+.backdrop__layer--golden   { background: linear-gradient(180deg, #C7BCD9 0%, #E7BFC4 48%, #F5CDAB 100%); }
+.backdrop__layer--night    {
+  background:
+    radial-gradient(60% 45% at 50% 30%, rgba(120, 140, 190, 0.18), transparent 70%), /* 은은한 달빛 */
+    linear-gradient(180deg, #141B2D 0%, #1F2840 55%, #2B3652 100%);
+}
+
+/* ---------- 2. 기본 설정 ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* 너비 계산에 padding·border를 포함 → 레이아웃 계산이 쉬워짐 */
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* 모바일에서 가로 스크롤이 생기지 않도록 */
+  /* 하늘 단계가 바뀌면 글자색이 부드럽게 바뀜 (배경은 .backdrop 그라데이션) */
+  transition: background-color var(--theme) var(--ease), color var(--theme) var(--ease);
+}
+
+img {
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* 키보드(Tab 키)로 이동할 때 현재 위치를 보여주는 테두리 — 접근성을 위해 중요합니다 */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- 3. 상단: 작은 라벨 + 요일 인사말 + 시간·날씨 ----------
+   예전보다 높이를 줄여서 캐릭터 영역에 여유를 줌 */
+.masthead {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+}
+
+/* 작은 상단 라벨: HYUNGEE JO · SEOUL */
+.masthead__label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color var(--theme) var(--ease);
+}
+
+/* 메인 헤드라인: Hello, it's Wednesday! */
+.greeting {
+  margin: 10px 0 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+/* 서울 현재 시간 · 날씨 */
+.masthead__now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color var(--theme) var(--ease);
+}
+
+.masthead__sep {
+  opacity: 0.5;
+}
+
+/* ---------- 4. 메인 무대: 3단 구성 ----------
+   grid-template-areas로 칸의 이름을 정해두고, 모바일에서는 순서만 바꿉니다. */
+.stage {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 32px 40px;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 360px; /* 왼쪽: 56px 캐릭터 버튼에 맞춘 폭 */
+  grid-template-areas: "picker hero info";
+  align-items: center;
+  gap: 40px;
+}
+
+.picker { grid-area: picker; }
+.hero   { grid-area: hero; }
+.info   { grid-area: info; }
+
+/* ---------- 5. 왼쪽: 캐릭터 선택 카드 ---------- */
+.picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 캐릭터 선택 버튼: 56px 정사각형. 평소엔 배경 없이 이미지만 */
+.card {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.35s var(--ease),
+    background-color var(--theme) var(--ease),
+    border-color 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+
+/* 마우스를 올리면 은은한 배경 + 살짝 확대 */
+.card:hover {
+  transform: scale(1.06);
+  background: var(--card);
+}
+
+/* 선택된 캐릭터: 은은한 배경 + 얇은 테두리만 (글자 표시 없음) */
+.card[aria-pressed="true"] {
+  border-color: var(--line);
+  background: var(--card-strong);
+  box-shadow: 0 8px 18px -12px var(--shadow);
+}
+
+/* 작은 캐릭터 이미지: 원본 비율 유지 (잘리지 않게 contain).
+   이미지는 투명 여백을 거의 잘라둔 상태라 48px 안에 꽉 차게 보임 */
+.card__thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  transition: transform 0.35s var(--ease);
+}
+
+.card:hover .card__thumb {
+  transform: scale(1.06);
+}
+
+/* 지금 한국시간 캐릭터 표시: 화면에는 보이지 않고 화면 낭독기만 "Now"를 읽음 */
+.card__now {
+  position: absolute;
+}
+
+/* 화면에는 안 보이고 화면 낭독기만 읽는 글자 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.card__now[hidden] {
+  display: none;
+}
+
+/* ---------- 6. 가운데: 큰 캐릭터 ---------- */
+.hero {
+  position: relative;
+  margin: 0;
+  height: clamp(380px, 64vh, 680px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 바닥에 깔리는 은은한 그림자 (캐릭터가 떠 보이지 않게) */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: -6px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--shadow), transparent);
+  z-index: -1;
+  transition: background var(--theme) var(--ease);
+}
+
+/* 큰 캐릭터 상자: 이미지와 정확히 같은 비율로 만들어서, 칸 안에 꽉 차게(넘치지 않게) 배치.
+   cqw/cqh = 부모(.hero) 너비·높이의 1% → 가로·세로 중 먼저 닿는 쪽에 맞춤 (= object-fit: contain과 같은 효과) */
+.hero {
+  container-type: size;
+}
+
+.hero__art {
+  position: relative;
+  width: min(100cqw, 100cqh * var(--ratio));
+  aspect-ratio: var(--ratio);
+  isolation: isolate; /* 겹친 이미지들이 바깥 배경과 섞이지 않도록 */
+  transition: opacity var(--fade) var(--ease), transform var(--fade) var(--ease);
+}
+
+/* 캐릭터가 바뀌는 중: script.js가 is-swapping을 붙였다 떼면서 fade/scale 전환 */
+.hero__art.is-swapping {
+  opacity: 0;
+  transform: scale(0.96) translateY(8px);
+}
+
+.hero__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ---------- 6-1. 캐릭터 모션 ----------
+   원리: 같은 이미지를 겹쳐 놓고
+   - hero__part: 움직일 부분(머리, 손 등)만 부드러운 타원 모양으로 보이게 함 (mask)
+   - hero__base: 그 부분만 반대로 부드럽게 비워 둠
+   → 두 장을 더하면(plus-lighter) 원래 그림과 똑같고, part만 몇 px 움직이면
+     경계가 부드럽게 이어져서 그 부분만 움직이는 것처럼 보입니다.
+   좌표(%)는 이미지 속 위치입니다. 움직임은 일부러 아주 작게(1~2도, 몇 px) 잡았어요. */
+.hero__part {
+  mix-blend-mode: plus-lighter;
+  display: none;
+  will-change: transform;
+}
+
+.hero__zzz {
+  display: none;
+}
+
+/* Work: 머리 끄덕임(a) + 타자 치는 손(b) */
+.hero__art[data-motion="work"] .hero__base {
+  -webkit-mask-image:
+    radial-gradient(ellipse 30% 24% at 39% 27%, transparent 60%, #000 100%),
+    radial-gradient(ellipse 13% 6% at 47% 58%, transparent 50%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 30% 24% at 39% 27%, transparent 60%, #000 100%),
+    radial-gradient(ellipse 13% 6% at 47% 58%, transparent 50%, #000 100%);
+  mask-composite: intersect;
+}
+
+.hero__art[data-motion="work"] .hero__part--a {
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 30% 24% at 39% 27%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 30% 24% at 39% 27%, #000 60%, transparent 100%);
+  transform-origin: 40% 46%; /* 목 */
+  animation: work-nod 3.6s ease-in-out infinite;
+}
+
+.hero__art[data-motion="work"] .hero__part--b {
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 13% 6% at 47% 58%, #000 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 13% 6% at 47% 58%, #000 50%, transparent 100%);
+  animation: work-type 1.4s ease-in-out infinite;
+}
+
+@keyframes work-nod {
+  0%, 70%, 100% { transform: none; }
+  35%           { transform: rotate(1.2deg) translateY(0.4%); }
+  55%           { transform: rotate(0.4deg) translateY(0.1%); }
+}
+
+@keyframes work-type {
+  0%, 24%, 48%, 74%, 100% { transform: none; }
+  12%                     { transform: translateY(0.35%); }
+  36%                     { transform: translateY(0.25%); }
+  62%                     { transform: translateY(0.3%); }
+}
+
+/* Foodie: 오물오물 씹는 턱(a) + 포크 든 손을 살짝 드는 동작(b) */
+.hero__art[data-motion="foodie"] .hero__base {
+  -webkit-mask-image:
+    radial-gradient(ellipse 11% 5.5% at 49% 37%, transparent 45%, #000 100%),
+    radial-gradient(ellipse 15% 16% at 24% 42%, transparent 70%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 11% 5.5% at 49% 37%, transparent 45%, #000 100%),
+    radial-gradient(ellipse 15% 16% at 24% 42%, transparent 70%, #000 100%);
+  mask-composite: intersect;
+}
+
+.hero__art[data-motion="foodie"] .hero__part--a {
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 11% 5.5% at 49% 37%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 11% 5.5% at 49% 37%, #000 45%, transparent 100%);
+  transform-origin: 49% 32%; /* 코 바로 아래 */
+  animation: foodie-chew 2.8s ease-in-out infinite;
+}
+
+.hero__art[data-motion="foodie"] .hero__part--b {
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 15% 16% at 24% 42%, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse 15% 16% at 24% 42%, #000 70%, transparent 100%);
+  transform-origin: 30% 56%; /* 손목 */
+  animation: foodie-fork 3.4s ease-in-out infinite;
+}
+
+@keyframes foodie-chew {
+  0%, 16%, 32%, 48%, 100% { transform: none; }
+  8%                      { transform: scaleY(1.07); }
+  24%                     { transform: scaleY(1.06); }
+  40%                     { transform: scaleY(1.07); }
+}
+
+@keyframes foodie-fork {
+  0%, 100% { transform: none; }
+  45%      { transform: rotate(-1.5deg) translateY(-0.4%); }
+}
+
+/* Off-Duty: 상체+골프채를 함께 살짝 비트는 스윙 리듬 (a = 상체 타원 + 클럽 헤드 타원) */
+.hero__art[data-motion="offduty"] .hero__base {
+  -webkit-mask-image:
+    radial-gradient(ellipse 36% 34% at 45% 24%, transparent 75%, #000 100%),
+    radial-gradient(ellipse 8% 8% at 14% 56%, transparent 60%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 36% 34% at 45% 24%, transparent 75%, #000 100%),
+    radial-gradient(ellipse 8% 8% at 14% 56%, transparent 60%, #000 100%);
+  mask-composite: intersect;
+}
+
+.hero__art[data-motion="offduty"] .hero__part--a {
+  display: block;
+  -webkit-mask-image:
+    radial-gradient(ellipse 36% 34% at 45% 24%, #000 75%, transparent 100%),
+    radial-gradient(ellipse 8% 8% at 14% 56%, #000 60%, transparent 100%);
+  mask-image:
+    radial-gradient(ellipse 36% 34% at 45% 24%, #000 75%, transparent 100%),
+    radial-gradient(ellipse 8% 8% at 14% 56%, #000 60%, transparent 100%);
+  transform-origin: 50% 60%; /* 허리 */
+  animation: offduty-swing 3.8s ease-in-out infinite;
+}
+
+@keyframes offduty-swing {
+  0%, 85%, 100% { transform: none; }
+  30%, 45%      { transform: rotate(-1.4deg); }  /* 백스윙 */
+  70%           { transform: rotate(1deg); }     /* 다운스윙 */
+}
+
+/* Sleep: 천천히 뒤척이는 머리(a) + 숨 쉬듯 오르내리는 이불(b) + 떠오르는 Zzz */
+.hero__art[data-motion="sleep"] .hero__base {
+  -webkit-mask-image:
+    radial-gradient(ellipse 16% 16% at 64% 25%, transparent 60%, #000 100%),
+    radial-gradient(ellipse 42% 20% at 40% 65%, transparent 55%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 16% 16% at 64% 25%, transparent 60%, #000 100%),
+    radial-gradient(ellipse 42% 20% at 40% 65%, transparent 55%, #000 100%);
+  mask-composite: intersect;
+}
+
+.hero__art[data-motion="sleep"] .hero__part--a {
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 16% 16% at 64% 25%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 16% 16% at 64% 25%, #000 60%, transparent 100%);
+  transform-origin: 72% 42%; /* 베개에 닿은 턱 */
+  animation: sleep-turn 7s ease-in-out infinite;
+}
+
+.hero__art[data-motion="sleep"] .hero__part--b {
+  display: block;
+  -webkit-mask-image: radial-gradient(ellipse 42% 20% at 40% 65%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 42% 20% at 40% 65%, #000 55%, transparent 100%);
+  transform-origin: 40% 85%; /* 침대 */
+  animation: sleep-breathe 4.5s ease-in-out infinite;
+}
+
+@keyframes sleep-turn {
+  0%, 100% { transform: none; }
+  50%      { transform: rotate(-1deg) translateY(0.5%); }
+}
+
+@keyframes sleep-breathe {
+  0%, 100% { transform: none; }
+  50%      { transform: scaleY(1.015); }
+}
+
+/* 작은 Zzz: 이미지 속 z 글자 근처에서 하나씩 떠올랐다 사라짐 */
+.hero__art[data-motion="sleep"] .hero__zzz {
+  display: block;
+  position: absolute;
+  left: 84%;
+  top: 16%;
+  width: 1px;
+  height: 1px;
+}
+
+.hero__zzz span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(14px, 1.5vw, 22px);
+  color: var(--accent);
+  animation: zzz-float 4.2s ease-out infinite;
+}
+
+.hero__zzz span:nth-child(2) { animation-delay: 1.4s; font-size: clamp(12px, 1.2vw, 18px); }
+.hero__zzz span:nth-child(3) { animation-delay: 2.8s; font-size: clamp(10px, 1vw, 15px); }
+
+@keyframes zzz-float {
+  0%   { opacity: 0;   transform: translate(0, 0) scale(0.7); }
+  20%  { opacity: 0.9; }
+  100% { opacity: 0;   transform: translate(18px, -44px) scale(1.1); }
+}
+
+/* plus-lighter를 지원하지 않는 오래된 브라우저: 경계가 비치지 않도록 기본 이미지는 그대로 둠 */
+@supports not (mix-blend-mode: plus-lighter) {
+  .hero__art .hero__base {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}
+
+/* ---------- 6-2. 하늘 (해·달·별) ----------
+   캐릭터 뒤쪽 레이어. script.js가 실제 서울 일출·일몰 시각으로 계산한 값을 넣어줍니다.
+   --p : 0(일출/일몰 직후, 왼쪽 아래) → 1(일몰/일출 직전, 오른쪽 아래) 진행도
+   --h : 높이 0(지평선) → 1(가장 높음)
+   --twilight : 밤의 깊이 0 → 1 (달·별이 서서히 나타나고 사라지게)
+   data-phase : day(해) / night(달·별) / fallback(일출·일몰을 못 불러옴 → 기본 배경) */
+
+/* 레이어 순서: 하늘(0) → 바닥 그림자(1) → 캐릭터(2) */
+.hero::after { z-index: 1; }
+.hero__art   { z-index: 2; }
+
+.sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;      /* 하늘은 가운데 칸 안에서만 → 텍스트·카드를 절대 가리지 않음 */
+  pointer-events: none;  /* 클릭을 방해하지 않음 */
+  --p: 0.5;
+  --h: 0;
+  --twilight: 0;
+}
+
+/* 해·달 공통: 원 하나. 왼쪽 아래 → 위 → 오른쪽 아래로 이어지는 호를 따라 이동
+   (지평선 = 칸의 바닥선. 해가 뜨고 질 때는 반쯤 가려짐) */
+.sky__body {
+  --pad: calc(var(--r) * 0.3);
+  position: absolute;
+  width: calc(var(--r) * 2);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  left: calc(var(--pad) + (100cqw - 2 * var(--pad) - 2 * var(--r)) * var(--p));
+  top: calc((100cqh - var(--r)) - (100cqh - var(--r) - 6cqh) * var(--h));
+  opacity: 0;
+  transition:
+    left 1.5s linear,
+    top 1.5s linear,
+    opacity 1.2s var(--ease),
+    background-color var(--theme) var(--ease);
+}
+
+/* 해: 높이 뜰수록 옅은 색, 지평선에 가까울수록 따뜻한 주황빛 */
+.sky__sun {
+  --r: 27cqmin;
+  background: var(--sun-high);
+}
+
+.sky__sun::before { /* 지평선 근처의 따뜻한 색 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--sun-low);
+  opacity: calc(1 - var(--h));
+  transition: opacity 1.5s linear, background-color var(--theme) var(--ease);
+}
+
+.sky__sun::after { /* 은은한 빛 번짐 */
+  content: "";
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--sun-halo) 40%, transparent 70%);
+  z-index: -1;
+}
+
+/* 달: 해보다 작고, 밤의 깊이(--twilight)에 따라 서서히 나타남 */
+.sky__moon {
+  --r: 15cqmin;
+  /* 반투명한 달빛 + 그 아래 배경색 한 겹 → 같은 색감이지만 뒤의 별이 비치지 않음 */
+  background:
+    radial-gradient(circle at 36% 32%, color-mix(in srgb, var(--moon) 55%, #fff) 0%, var(--moon) 75%),
+    var(--bg);
+  box-shadow: 0 0 10cqmin 1cqmin var(--moon-glow);
+}
+
+.sky[data-phase="day"] .sky__sun { opacity: 1; }
+.sky[data-phase="night"] .sky__moon { opacity: var(--twilight); }
+
+/* 별: 밤에만, 아주 작게 반짝임 */
+.sky__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease);
+}
+
+.sky[data-phase="night"] .sky__stars { opacity: var(--twilight); }
+
+.sky__star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--star);
+  animation: twinkle 5s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* 일출·일몰을 못 불러왔을 때(또는 불러오는 중): 시각을 암시하지 않는 은은한 원형 기본 배경 */
+.sky__halo {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 70cqmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--halo) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 1.2s var(--ease);
+}
+
+.sky[data-phase="fallback"] .sky__halo { opacity: 1; }
+
+/* ---------- 7. 오른쪽: 설명 패널 ---------- */
+.info {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: 0 30px 60px -40px var(--shadow);
+  transition: background-color var(--theme) var(--ease), border-color var(--theme) var(--ease);
+}
+
+.info__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* 'Live now in Seoul' 상태 표시 (지금 시간 캐릭터일 때만) */
+.info__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.info__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.info__status[hidden] {
+  display: none;
+}
+
+/* Back to Now: 테두리 없는 작은 텍스트 링크 모양 */
+.back-to-now {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line);
+  cursor: pointer;
+  transition: color 0.25s, text-decoration-color 0.25s;
+}
+
+.back-to-now:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+.back-to-now[hidden] {
+  display: none;
+}
+
+/* 설명 내용 전체: 바뀔 때 살짝 아래에서 올라오며 나타남 */
+.info__content {
+  transition: opacity var(--fade) var(--ease), transform var(--fade) var(--ease);
+}
+
+.info__content.is-swapping {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.info__label {
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.info__title {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance; /* 줄 길이를 고르게 → 한 단어만 다음 줄로 떨어지는 어색함 방지 */
+}
+
+.info__body {
+  margin: 12px 0 0;
+  color: var(--muted);
+  text-wrap: pretty; /* 마지막 줄에 단어 하나만 남지 않게 */
+}
+
+/* 소속·직무 (Work) */
+.info__facts {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.info__facts[hidden] {
+  display: none;
+}
+
+.info__facts div {
+  display: grid;
+  gap: 2px;
+}
+
+.info__facts dt {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.info__facts dd {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 지금 시간과 다른 캐릭터를 골랐을 때의 재치 있는 한 줄 */
+.info__quip {
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  border-radius: 4px 12px 12px 4px;
+  background: var(--card-strong);
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.info__quip[hidden] {
+  display: none;
+}
+
+.info__cta {
+  margin: 22px 0 12px;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+/* 버튼 묶음 */
+.info__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), opacity 0.25s, background-color var(--theme), color var(--theme);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* 아직 주소가 정해지지 않은(TBD) 링크: 점선 + 흐린 글씨, 눌러도 아무 일 없음 */
+.btn--tbd {
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  cursor: not-allowed;
+}
+
+.btn--tbd:hover {
+  transform: none;
+}
+
+.btn__tag {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--card-strong);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- 8. 하단 ---------- */
+.site-footer {
+  padding: 16px 32px 28px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  transition: color var(--theme) var(--ease);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* ---------- 9. 시간 테스트 패널 (?test 로 열었을 때만) ---------- */
+.test-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #222222;
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.45);
+  font-size: 0.8rem;
+}
+
+.test-panel[hidden] {
+  display: none;
+}
+
+.test-panel__title {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.test-panel details[open] .test-panel__title {
+  margin-bottom: 8px;
+}
+
+.test-panel__field {
+  display: grid;
+  gap: 4px;
+}
+
+.test-panel__field input {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+}
+
+.test-panel__presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.test-panel button {
+  padding: 6px 8px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background: #f6f6f6;
+  color: #222222;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.test-panel button:hover {
+  background: #ececec;
+}
+
+.test-panel .test-panel__reset {
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ---------- 10. 태블릿·모바일 (폭 1024px 미만) ----------
+   순서: 상단 정보 → 타이틀 → 큰 캐릭터 → 작은 카드 4개(가로) → 설명 */
+@media (max-width: 1023px) {
+  .masthead {
+    padding: 20px 20px 0;
+  }
+
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "hero"
+      "info"
+      "picker";   /* 캐릭터 선택은 콘텐츠 맨 마지막 (화면에 고정되지 않음) */
+    gap: 20px;
+    padding: 12px 20px 32px;
+  }
+
+  .hero {
+    height: clamp(260px, 46vh, 480px);
+  }
+
+  /* 캐릭터 4개를 가로 한 줄로, 가운데 정렬 */
+  .picker__list {
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .info {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 380px) {
+  .masthead,
+  .stage {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .picker__list {
+    gap: 8px;
+  }
+}
+
+/* ---------- 11. 움직임 줄이기 설정 ----------
+   기기에서 '동작 줄이기'를 켠 사용자에게는 애니메이션을 끕니다. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .card:hover,
+  .card:hover .card__thumb,
+  .btn:hover {
+    transform: none;
+  }
+}
