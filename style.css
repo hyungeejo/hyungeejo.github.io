@@ -199,6 +199,7 @@ button {
 /* 작은 상단 라벨: HYUNGEE JO · SEOUL */
 .masthead__label {
   margin: 0;
+  white-space: nowrap; /* SEOUL · 날씨 · 기온이 항상 한 줄로 */
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -207,31 +208,46 @@ button {
   transition: color var(--theme) var(--ease);
 }
 
-/* 메인 헤드라인: Hello, it's Wednesday! */
+.masthead__sep {
+  margin: 0 4px;
+  opacity: 0.5;
+}
+
+/* 날씨 이모지는 대문자 변환·자간의 영향을 받지 않게 */
+.masthead__weather {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* 메인 헤드라인: "Hello, it's Thursday! 11:51 AM"
+   데스크톱에서는 반드시 한 줄 (white-space: nowrap) — 화면 폭에 맞춰 글자 크기가 함께 줄어듦 */
 .greeting {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   font-family: "Fraunces", Georgia, serif;
   font-weight: 400;
-  font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+  font-size: clamp(2.4rem, 6vw, 5.2rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
+  white-space: nowrap;
 }
 
-/* 서울 현재 시간 · 날씨 */
-.masthead__now {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 10px;
-  margin: 10px 0 0;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--muted);
-  transition: color var(--theme) var(--ease);
+.greeting__day,
+.greeting__time {
+  white-space: nowrap; /* 요일 문장·시간이 중간에서 끊기지 않게 */
 }
 
-.masthead__sep {
-  opacity: 0.5;
+/* 모바일: 두 줄 (첫째 줄 인사말, 둘째 줄 시간), 모두 왼쪽 정렬.
+   글자 크기는 화면 폭에 비례 → 가장 긴 "Wednesday"도 잘리지 않음 */
+@media (max-width: 640px) {
+  .greeting {
+    font-size: clamp(1.6rem, 8.4vw, 2.6rem);
+    line-height: 1.12;
+  }
+
+  .greeting__time {
+    display: block;
+    margin-top: 2px;
+  }
 }
 
 /* ---------- 4. 메인 무대: 3단 구성 ----------
@@ -362,17 +378,17 @@ button {
   position: relative;
   width: min(100cqw, 100cqh * var(--ratio));
   aspect-ratio: var(--ratio);
-  isolation: isolate; /* 겹친 이미지들이 바깥 배경과 섞이지 않도록 */
   transition: opacity var(--fade) var(--ease), transform var(--fade) var(--ease);
 }
 
-/* 캐릭터가 바뀌는 중: script.js가 is-swapping을 붙였다 떼면서 fade/scale 전환 */
+/* 캐릭터가 바뀌는 중: script.js가 is-swapping을 붙였다 떼면서 가볍게 fade-in (반복 없음, 전환 때 한 번만) */
 .hero__art.is-swapping {
   opacity: 0;
   transform: scale(0.96) translateY(8px);
 }
 
-.hero__layer {
+/* 캐릭터 이미지·영상: 상자에 꽉 차되 원본 비율 유지 (찌그러지거나 잘리지 않게 contain) */
+.hero__image {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -380,173 +396,22 @@ button {
   object-fit: contain;
 }
 
-/* ---------- 6-1. 캐릭터 모션 ----------
-   원리: 같은 이미지를 겹쳐 놓고
-   - hero__part: 움직일 부분(머리, 손 등)만 부드러운 타원 모양으로 보이게 함 (mask)
-   - hero__base: 그 부분만 반대로 부드럽게 비워 둠
-   → 두 장을 더하면(plus-lighter) 원래 그림과 똑같고, part만 몇 px 움직이면
-     경계가 부드럽게 이어져서 그 부분만 움직이는 것처럼 보입니다.
-   좌표(%)는 이미지 속 위치입니다. 움직임은 일부러 아주 작게(1~2도, 몇 px) 잡았어요. */
-.hero__part {
-  mix-blend-mode: plus-lighter;
+.hero__image[hidden] {
   display: none;
-  will-change: transform;
 }
 
+/* 영상은 클릭·길게 누르기 메뉴 등을 막아 이미지처럼 보이게 */
+.hero__video {
+  pointer-events: none;
+  background: transparent;
+}
+
+/* Sleep의 작은 Zzz: 이미지 속 z 글자 근처에서 하나씩 천천히 떠올랐다 사라짐 */
 .hero__zzz {
   display: none;
 }
 
-/* Work: 머리 끄덕임(a) + 타자 치는 손(b) */
-.hero__art[data-motion="work"] .hero__base {
-  -webkit-mask-image:
-    radial-gradient(ellipse 30% 24% at 39% 27%, transparent 60%, #000 100%),
-    radial-gradient(ellipse 13% 6% at 47% 58%, transparent 50%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    radial-gradient(ellipse 30% 24% at 39% 27%, transparent 60%, #000 100%),
-    radial-gradient(ellipse 13% 6% at 47% 58%, transparent 50%, #000 100%);
-  mask-composite: intersect;
-}
-
-.hero__art[data-motion="work"] .hero__part--a {
-  display: block;
-  -webkit-mask-image: radial-gradient(ellipse 30% 24% at 39% 27%, #000 60%, transparent 100%);
-  mask-image: radial-gradient(ellipse 30% 24% at 39% 27%, #000 60%, transparent 100%);
-  transform-origin: 40% 46%; /* 목 */
-  animation: work-nod 3.6s ease-in-out infinite;
-}
-
-.hero__art[data-motion="work"] .hero__part--b {
-  display: block;
-  -webkit-mask-image: radial-gradient(ellipse 13% 6% at 47% 58%, #000 50%, transparent 100%);
-  mask-image: radial-gradient(ellipse 13% 6% at 47% 58%, #000 50%, transparent 100%);
-  animation: work-type 1.4s ease-in-out infinite;
-}
-
-@keyframes work-nod {
-  0%, 70%, 100% { transform: none; }
-  35%           { transform: rotate(1.2deg) translateY(0.4%); }
-  55%           { transform: rotate(0.4deg) translateY(0.1%); }
-}
-
-@keyframes work-type {
-  0%, 24%, 48%, 74%, 100% { transform: none; }
-  12%                     { transform: translateY(0.35%); }
-  36%                     { transform: translateY(0.25%); }
-  62%                     { transform: translateY(0.3%); }
-}
-
-/* Foodie: 오물오물 씹는 턱(a) + 포크 든 손을 살짝 드는 동작(b) */
-.hero__art[data-motion="foodie"] .hero__base {
-  -webkit-mask-image:
-    radial-gradient(ellipse 11% 5.5% at 49% 37%, transparent 45%, #000 100%),
-    radial-gradient(ellipse 15% 16% at 24% 42%, transparent 70%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    radial-gradient(ellipse 11% 5.5% at 49% 37%, transparent 45%, #000 100%),
-    radial-gradient(ellipse 15% 16% at 24% 42%, transparent 70%, #000 100%);
-  mask-composite: intersect;
-}
-
-.hero__art[data-motion="foodie"] .hero__part--a {
-  display: block;
-  -webkit-mask-image: radial-gradient(ellipse 11% 5.5% at 49% 37%, #000 45%, transparent 100%);
-  mask-image: radial-gradient(ellipse 11% 5.5% at 49% 37%, #000 45%, transparent 100%);
-  transform-origin: 49% 32%; /* 코 바로 아래 */
-  animation: foodie-chew 2.8s ease-in-out infinite;
-}
-
-.hero__art[data-motion="foodie"] .hero__part--b {
-  display: block;
-  -webkit-mask-image: radial-gradient(ellipse 15% 16% at 24% 42%, #000 70%, transparent 100%);
-  mask-image: radial-gradient(ellipse 15% 16% at 24% 42%, #000 70%, transparent 100%);
-  transform-origin: 30% 56%; /* 손목 */
-  animation: foodie-fork 3.4s ease-in-out infinite;
-}
-
-@keyframes foodie-chew {
-  0%, 16%, 32%, 48%, 100% { transform: none; }
-  8%                      { transform: scaleY(1.07); }
-  24%                     { transform: scaleY(1.06); }
-  40%                     { transform: scaleY(1.07); }
-}
-
-@keyframes foodie-fork {
-  0%, 100% { transform: none; }
-  45%      { transform: rotate(-1.5deg) translateY(-0.4%); }
-}
-
-/* Off-Duty: 상체+골프채를 함께 살짝 비트는 스윙 리듬 (a = 상체 타원 + 클럽 헤드 타원) */
-.hero__art[data-motion="offduty"] .hero__base {
-  -webkit-mask-image:
-    radial-gradient(ellipse 36% 34% at 45% 24%, transparent 75%, #000 100%),
-    radial-gradient(ellipse 8% 8% at 14% 56%, transparent 60%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    radial-gradient(ellipse 36% 34% at 45% 24%, transparent 75%, #000 100%),
-    radial-gradient(ellipse 8% 8% at 14% 56%, transparent 60%, #000 100%);
-  mask-composite: intersect;
-}
-
-.hero__art[data-motion="offduty"] .hero__part--a {
-  display: block;
-  -webkit-mask-image:
-    radial-gradient(ellipse 36% 34% at 45% 24%, #000 75%, transparent 100%),
-    radial-gradient(ellipse 8% 8% at 14% 56%, #000 60%, transparent 100%);
-  mask-image:
-    radial-gradient(ellipse 36% 34% at 45% 24%, #000 75%, transparent 100%),
-    radial-gradient(ellipse 8% 8% at 14% 56%, #000 60%, transparent 100%);
-  transform-origin: 50% 60%; /* 허리 */
-  animation: offduty-swing 3.8s ease-in-out infinite;
-}
-
-@keyframes offduty-swing {
-  0%, 85%, 100% { transform: none; }
-  30%, 45%      { transform: rotate(-1.4deg); }  /* 백스윙 */
-  70%           { transform: rotate(1deg); }     /* 다운스윙 */
-}
-
-/* Sleep: 천천히 뒤척이는 머리(a) + 숨 쉬듯 오르내리는 이불(b) + 떠오르는 Zzz */
-.hero__art[data-motion="sleep"] .hero__base {
-  -webkit-mask-image:
-    radial-gradient(ellipse 16% 16% at 64% 25%, transparent 60%, #000 100%),
-    radial-gradient(ellipse 42% 20% at 40% 65%, transparent 55%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    radial-gradient(ellipse 16% 16% at 64% 25%, transparent 60%, #000 100%),
-    radial-gradient(ellipse 42% 20% at 40% 65%, transparent 55%, #000 100%);
-  mask-composite: intersect;
-}
-
-.hero__art[data-motion="sleep"] .hero__part--a {
-  display: block;
-  -webkit-mask-image: radial-gradient(ellipse 16% 16% at 64% 25%, #000 60%, transparent 100%);
-  mask-image: radial-gradient(ellipse 16% 16% at 64% 25%, #000 60%, transparent 100%);
-  transform-origin: 72% 42%; /* 베개에 닿은 턱 */
-  animation: sleep-turn 7s ease-in-out infinite;
-}
-
-.hero__art[data-motion="sleep"] .hero__part--b {
-  display: block;
-  -webkit-mask-image: radial-gradient(ellipse 42% 20% at 40% 65%, #000 55%, transparent 100%);
-  mask-image: radial-gradient(ellipse 42% 20% at 40% 65%, #000 55%, transparent 100%);
-  transform-origin: 40% 85%; /* 침대 */
-  animation: sleep-breathe 4.5s ease-in-out infinite;
-}
-
-@keyframes sleep-turn {
-  0%, 100% { transform: none; }
-  50%      { transform: rotate(-1deg) translateY(0.5%); }
-}
-
-@keyframes sleep-breathe {
-  0%, 100% { transform: none; }
-  50%      { transform: scaleY(1.015); }
-}
-
-/* 작은 Zzz: 이미지 속 z 글자 근처에서 하나씩 떠올랐다 사라짐 */
-.hero__art[data-motion="sleep"] .hero__zzz {
+body[data-mode="sleep"] .hero__zzz {
   display: block;
   position: absolute;
   left: 84%;
@@ -575,14 +440,6 @@ button {
   0%   { opacity: 0;   transform: translate(0, 0) scale(0.7); }
   20%  { opacity: 0.9; }
   100% { opacity: 0;   transform: translate(18px, -44px) scale(1.1); }
-}
-
-/* plus-lighter를 지원하지 않는 오래된 브라우저: 경계가 비치지 않도록 기본 이미지는 그대로 둠 */
-@supports not (mix-blend-mode: plus-lighter) {
-  .hero__art .hero__base {
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-  }
 }
 
 /* ---------- 6-2. 하늘 (해·달·별) ----------
@@ -1008,8 +865,9 @@ button {
     padding: 12px 20px 32px;
   }
 
+  /* 모바일: 캐릭터 영역 높이를 영상 비율(874:800)에 맞춰 위쪽 빈 공간을 줄임 */
   .hero {
-    height: clamp(260px, 46vh, 480px);
+    height: clamp(240px, min(46vh, (100vw - 40px) * 0.92), 480px);
   }
 
   /* 캐릭터 4개를 가로 한 줄로, 가운데 정렬 */

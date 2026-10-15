@@ -18,7 +18,7 @@
 </head>
 
 <!--
-  data-mode: 지금 보여주는 캐릭터(work / foodie / offduty / sleep) — 캐릭터 모션에 사용
+  data-mode: 지금 보여주는 캐릭터(work / foodie / offduty / sleep)
   data-sky : 실제 서울 하늘 단계(morning / daylight / golden / night / neutral)
              → style.css가 배경 그라데이션과 글자색을 이 값에 맞춰 바꿉니다. (캐릭터와 별개)
 -->
@@ -35,15 +35,20 @@
 
   <!-- ===== 1. 상단: 서울 날짜·시간·날씨 + 사이트 제목 ===== -->
   <header class="masthead">
-    <p class="masthead__label">Hyungee Jo · Seoul</p>
-    <!-- 메인 헤드라인: 서울 요일에 맞춰 자동으로 바뀜 (예: Hello, it's Wednesday!) -->
-    <h1 class="greeting" id="greeting">Hello!</h1>
-    <!-- 서울 현재 시간 · 실제 날씨 (script.js가 실시간으로 채움) -->
-    <p class="masthead__now">
-      <span id="seoul-time">—</span>
+    <!-- 작은 상단 라벨 + 서울 실제 날씨 이모지 (예: HYUNGEE JO · SEOUL · ☀️) -->
+    <p class="masthead__label">
+      Hyungee Jo · Seoul
       <span class="masthead__sep" aria-hidden="true">·</span>
       <span id="seoul-weather" class="masthead__weather">--</span>
     </p>
+    <!--
+      메인 헤드라인: 서울 요일 + 서울 시간 (script.js가 분 단위로 갱신)
+      데스크톱: "Hello, it's Thursday! 11:51 AM" 한 줄 / 모바일: 두 줄
+    -->
+    <h1 class="greeting">
+      <span class="greeting__day" id="greeting">Hello!</span>
+      <span class="greeting__time" id="seoul-time">—</span>
+    </h1>
   </header>
 
   <!--
@@ -62,11 +67,10 @@
 
     <!--
       2-2. 가운데 큰 캐릭터
-      hero__art: 이미지와 똑같은 비율의 상자. 그래서 % 좌표 = 이미지 속 위치가 됩니다.
-      - hero__base: 기본 이미지
-      - hero__part (a, b): 같은 이미지를 한 장 더 겹치고, 머리·손·입 같은 '부분'만 보이게 가린 뒤
-        아주 조금 움직입니다. → 한 장의 PNG로 부분이 움직이는 듯한 느낌을 냄 (style.css 6-1 참고)
-      - hero__zzz: Sleep 모드에서만 떠오르는 작은 z 글자
+      hero__art: 그림과 똑같은 비율의 상자
+      - hero__image: 정적 WebP (Sleep / 동작 줄이기 / 영상 실패 시)
+      - hero__video: Work·Foodie·Off-Duty 투명 배경 영상 (소리 없음, 자동 재생)
+      - hero__zzz: Sleep에서만 천천히 떠오르는 z 글자 (캐릭터 몸은 움직이지 않음)
       sky: 캐릭터 뒤쪽 하늘 레이어. 실제 서울 일출·일몰에 맞춰 해/달이 움직입니다 (script.js "F-2")
     -->
     <figure class="hero">
@@ -76,11 +80,11 @@
         <div class="sky__body sky__moon"></div>
         <div class="sky__body sky__sun"></div>
       </div>
-      <div class="hero__art" id="hero-art" data-motion="work" style="--ratio: 1131 / 1354">
-        <img class="hero__layer hero__base" id="hero-image"
+      <div class="hero__art" id="hero-art" style="--ratio: 1131 / 1354">
+        <img class="hero__image" id="hero-image"
              src="assets/work-hyungee.webp" alt="" width="1131" height="1354" />
-        <img class="hero__layer hero__part hero__part--a" src="assets/work-hyungee.webp" alt="" aria-hidden="true" />
-        <img class="hero__layer hero__part hero__part--b" src="assets/work-hyungee.webp" alt="" aria-hidden="true" />
+        <video class="hero__image hero__video" id="hero-video"
+               muted playsinline autoplay preload="auto" disablepictureinpicture hidden></video>
         <span class="hero__zzz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></span>
       </div>
     </figure>

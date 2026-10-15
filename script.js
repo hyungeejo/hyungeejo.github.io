@@ -18,6 +18,9 @@
 
 /**
  * 캐릭터별 내용.
+ * - video가 있으면 메인 영역에 투명 배경 영상을 보여주고, 없거나 실패하면 image(WebP)를 보여줍니다.
+ *   webm = Chrome·Edge·Firefox용(VP9 투명), hevc = Safari·iPhone용(HEVC 투명)
+ *   loop: true = 계속 반복 / false = 한 번 재생 후 마지막 장면에서 멈춤
  * - links의 url이 null이면 "TBD(미설정)" 버튼으로 표시되고 눌러도 아무 일도 없습니다.
  *   주소가 생기면 null 대신 "https://..." (이메일은 "mailto:주소") 를 넣으세요.
  */
@@ -28,6 +31,12 @@ const CHARACTERS = {
     width: 1131,
     height: 1354,
     alt: "Hyungee in a navy suit, typing on a laptop at her desk",
+    video: {
+      webm: "assets/video/work-hyungee-alpha.webm",
+      hevc: "assets/video/work-hyungee-alpha.mov",
+      poster: "assets/video/work-hyungee-poster.webp",
+      width: 874, height: 800, loop: true,
+    },
     label: "Work mode",
     title: "Oops, Hyungee’s at work!",
     body: "Probably juggling a million things right now.",
@@ -48,6 +57,12 @@ const CHARACTERS = {
     width: 1150,
     height: 1342,
     alt: "Hyungee at a wooden table with steak, pasta and a glass of red wine",
+    video: {
+      webm: "assets/video/foodie-hyungee-alpha.webm",
+      hevc: "assets/video/foodie-hyungee-alpha.mov",
+      poster: "assets/video/foodie-hyungee-poster.webp",
+      width: 874, height: 800, loop: true,
+    },
     label: "Foodie mode",
     title: "Shhh… Hyungee’s eating!",
     body: "Good food, good wine, great company.",
@@ -63,6 +78,12 @@ const CHARACTERS = {
     width: 1279,
     height: 1342,
     alt: "Hyungee in a white visor swinging a golf club on the grass",
+    video: {
+      webm: "assets/video/offduty-hyungee-alpha.webm",
+      hevc: "assets/video/offduty-hyungee-alpha.mov",
+      poster: "assets/video/offduty-hyungee-poster.webp",
+      width: 874, height: 800, loop: false, // 풀스윙 1회 → 피니시 자세 유지
+    },
     label: "Off-Duty mode",
     title: "Out of office, into the wild!",
     body: "Probably chasing golf balls… or sunshine.",
@@ -269,8 +290,8 @@ const els = {
   greeting: document.getElementById("greeting"),
   picker: document.getElementById("picker"),
   hero: document.getElementById("hero-image"),
+  heroVideo: document.getElementById("hero-video"),
   heroArt: document.getElementById("hero-art"),
-  heroParts: document.querySelectorAll(".hero__part"),
   info: document.getElementById("info"),
   content: document.getElementById("info-content"),
   status: document.getElementById("info-status"),
@@ -405,6 +426,85 @@ function updateStatus() {
   });
 }
 
+/* ---------------------------------------------------------
+   메인 캐릭터: 투명 배경 영상 또는 정적 WebP
+   --------------------------------------------------------- */
+
+/**
+ * 이 브라우저에서 쓸 투명 영상 형식
+ * - Safari·iPhone(모든 iOS 브라우저 포함): HEVC 투명 영상 (.mov)
+ * - Chrome·Edge·Firefox 등: VP9 투명 영상 (.webm)
+ * - 둘 다 안 되면 null → 정적 WebP
+ */
+const VIDEO_FORMAT = (() => {
+  const v = document.createElement("video");
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const isSafari = /Safari\//.test(ua) && /Version\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua);
+  if (isIOS || isSafari) return v.canPlayType('video/mp4; codecs="hvc1"') ? "hevc" : null;
+  return v.canPlayType('video/webm; codecs="vp9"') ? "webm" : null;
+})();
+
+/** 상자 비율을 지금 보여줄 그림에 맞춤 (찌그러지거나 잘리지 않게) */
+function setHeroRatio(width, height) {
+  els.heroArt.style.setProperty("--ratio", `${width} / ${height}`);
+}
+
+/** 정적 WebP 보여주기 (Sleep, 동작 줄이기 설정, 영상 실패 시) */
+function showStill(mode) {
+  const c = CHARACTERS[mode];
+  els.heroVideo.hidden = true;
+  els.hero.hidden = false;
+  els.hero.src = c.image;
+  els.hero.alt = c.alt;
+  els.hero.width = c.width;
+  els.hero.height = c.height;
+  setHeroRatio(c.width, c.height);
+}
+
+/** 투명 배경 영상 보여주기 (소리 없음, 자동 재생, 화면 안에서 재생) */
+function showVideo(mode) {
+  const c = CHARACTERS[mode];
+  const v = els.heroVideo;
+  v.muted = true;            // 영상에 오디오가 있어도 재생하지 않음 (파일에서도 오디오 제거됨)
+  v.loop = c.video.loop;     // Off-Duty는 false → 마지막 피니시 장면에서 멈춤
+  v.poster = c.video.poster; // 영상이 준비되기 전에는 같은 크기의 첫 장면을 보여줌
+  v.setAttribute("aria-label", c.alt);
+  v.src = c.video[VIDEO_FORMAT];
+  setHeroRatio(c.video.width, c.video.height);
+  els.hero.hidden = true;
+  v.hidden = false;
+
+  // 불러오기·재생 실패 → 기존 WebP로 대체 (그 사이 다른 캐릭터로 바뀌었으면 무시)
+  const fallback = () => { if (state.shownMode === mode && !v.hidden) { stopVideo(); showStill(mode); } };
+  v.onerror = fallback;
+  const playing = v.play();
+  if (playing) playing.catch(fallback); // 자동 재생이 막힌 경우(예: 저전력 모드)도 정적 이미지로
+}
+
+/** 영상 멈추고 내려받기 중단 */
+function stopVideo() {
+  const v = els.heroVideo;
+  v.onerror = null;
+  v.pause();
+  v.removeAttribute("src");
+  v.removeAttribute("poster");
+  v.load();
+  v.hidden = true;
+}
+
+/** 지금 보이는 그림이 준비될 때까지 기다림 (최대 1.5초) */
+function heroReady() {
+  const timeout = new Promise((r) => setTimeout(r, 1500));
+  if (!els.heroVideo.hidden) {
+    const v = els.heroVideo;
+    const loaded = v.readyState >= 2 ? Promise.resolve()
+      : new Promise((r) => { v.addEventListener("loadeddata", r, { once: true }); v.addEventListener("error", r, { once: true }); });
+    return Promise.race([loaded, timeout]);
+  }
+  return Promise.race([els.hero.decode().catch(() => {}), timeout]);
+}
+
 /** 캐릭터 화면 전환 (배경색·큰 이미지·설명) */
 function show(mode) {
   if (mode === state.shownMode) {
@@ -413,20 +513,14 @@ function show(mode) {
   }
   const first = state.shownMode === null;
   state.shownMode = mode;
-  document.body.dataset.mode = mode; // 캐릭터 모션용 (배경색은 하늘 단계가 결정)
+  document.body.dataset.mode = mode; // 지금 보이는 캐릭터 표시 (배경색은 하늘 단계가 결정)
   updateStatus();
 
   const c = CHARACTERS[mode];
   const apply = () => {
-    els.hero.src = c.image;
-    els.hero.alt = c.alt;
-    els.hero.width = c.width;
-    els.hero.height = c.height;
-    // 모션용으로 겹쳐 둔 이미지들도 같은 그림으로 교체
-    els.heroParts.forEach((part) => { part.src = c.image; });
-    // 상자 비율을 이미지에 맞추고, 모드별 움직임(style.css 6-1)을 선택
-    els.heroArt.style.setProperty("--ratio", `${c.width} / ${c.height}`);
-    els.heroArt.dataset.motion = mode;
+    stopVideo(); // 이전 캐릭터 영상은 멈추고 내려받기도 중단
+    if (c.video && VIDEO_FORMAT && !reduceMotion.matches) showVideo(mode);
+    else showStill(mode);
     fillInfo(mode);
   };
 
@@ -443,7 +537,7 @@ function show(mode) {
   setTimeout(async () => {
     if (token !== state.swapToken) return; // 그 사이 다른 캐릭터를 눌렀으면 이번 전환은 취소
     apply();
-    try { await els.hero.decode(); } catch (e) { /* 디코딩 실패해도 그대로 보여줌 */ }
+    await heroReady(); // 이미지 또는 영상 첫 장면이 준비될 때까지 (최대 1.5초)
     if (token !== state.swapToken) return;
     els.heroArt.classList.remove("is-swapping");
     els.content.classList.remove("is-swapping");
@@ -531,8 +625,9 @@ async function updateWeather() {
     if (!weather) throw new Error("Unknown weather code");
 
     const temp = Number.isFinite(current.temperature_2m) ? `${Math.round(current.temperature_2m)}°C` : "";
-    els.weather.textContent = `${weather.emoji} ${temp}`.trim();
-    els.weather.title = weather.label;
+    // 같은 응답(같은 시점)의 날씨 이모지 + 기온(정수 반올림). 기온 값이 없으면 이모지만 (임의 온도 표시 안 함)
+    els.weather.textContent = temp ? `${weather.emoji} ${temp}` : weather.emoji;
+    els.weather.title = `${weather.label}${temp ? `, ${temp}` : ""}`;
     els.weather.setAttribute("aria-label", `Weather in Seoul: ${weather.label}${temp ? `, ${temp}` : ""}`);
     return true;
   } catch (error) {
@@ -902,6 +997,13 @@ els.picker.addEventListener("keydown", (event) => {
 });
 
 els.backToNow.addEventListener("click", backToNow);
+
+// '동작 줄이기' 설정을 바꾸면 영상 ↔ 정적 이미지를 바로 다시 고름
+reduceMotion.addEventListener("change", () => {
+  const mode = state.shownMode;
+  state.shownMode = null;
+  show(mode);
+});
 document.getElementById("year").textContent = new Date().getFullYear();
 
 // 주소에 ?now=2026-10-19T11:30 이 있으면 그 한국시간으로 시작 (없으면 실제 현재 시각)
