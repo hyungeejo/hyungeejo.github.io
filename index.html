@@ -13,8 +13,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <!-- 디자인(스타일) 파일 연결 -->
-  <link rel="stylesheet" href="style.css" />
+  <!--
+    디자인(스타일) 파일 연결
+    ?v=3 : 캐시 방지용 버전 번호. style.css나 script.js를 수정해 배포할 때마다
+    이 줄과 파일 맨 아래 script.js 줄, 두 곳의 숫자를 함께 올려주세요(예: v=4).
+    그러면 방문자가 일반 새로고침만 해도 새 파일을 받습니다.
+  -->
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 
 <!--
@@ -142,6 +147,6 @@
   </aside>
 
   <!-- 동작(인터랙션) 파일 연결. 맨 아래에 두면 HTML을 다 읽은 뒤 실행됩니다 -->
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
